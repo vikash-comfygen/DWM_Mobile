@@ -1,23 +1,43 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import CustomVectorIcons from '../../components/CustomVectorIcons';
+import IMAGES from '../../assets/images';
 
 export default function EarnScreen() {
+  const [balanceVisible, setBalanceVisible] = useState(true);
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scroll}>
       {/* Equity Value Section */}
       <View style={styles.card}>
-        <View style={styles.rowBetween}>
+        {/* Title with eye icon centered */}
+        <View style={styles.rowCenter}>
           <Text style={styles.cardTitle}>Equity Value</Text>
-          <CustomVectorIcons
-            name="eye"
-            color="#aaa"
-            size={18}
-            iconSet="Feather"
-          />
+          <TouchableOpacity
+            onPress={() => setBalanceVisible(!balanceVisible)}
+            style={{ marginLeft: 6 }}
+          >
+            <CustomVectorIcons
+              name={balanceVisible ? 'eye' : 'eye-off'}
+              color="#aaa"
+              size={18}
+              iconSet="Feather"
+            />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.valueText}>$0</Text>
-        <Text style={styles.subValueText}>= 0 BTC</Text>
+
+        {/* Values */}
+        <Text style={styles.valueText}>{balanceVisible ? '$0' : '******'}</Text>
+        <Text style={styles.subValueText}>
+          {balanceVisible ? '= 0 BTC' : '******'}
+        </Text>
       </View>
 
       {/* Recommend Section */}
@@ -37,11 +57,10 @@ export default function EarnScreen() {
 
         <View style={styles.rowBetween}>
           <View style={styles.recommendBox}>
-            <CustomVectorIcons
-              name="currency-rupee"
-              iconSet="MaterialCommunityIcons"
-              color="#00ffa2"
-              size={20}
+            <Image
+              source={IMAGES.thetre}
+              style={styles.image}
+              resizeMode="contain"
             />
             <Text style={styles.aprText}>6.43% APR</Text>
           </View>
@@ -55,11 +74,10 @@ export default function EarnScreen() {
             <Text style={styles.aprText}>4.12% APR</Text>
           </View>
           <View style={styles.recommendBox}>
-            <CustomVectorIcons
-              name="solidity"
-              iconSet="MaterialCommunityIcons"
-              color="#00f2ff"
-              size={20}
+            <Image
+              source={IMAGES.solana}
+              style={styles.image}
+              resizeMode="contain"
             />
             <Text style={styles.aprText}>5.27% APR</Text>
           </View>
@@ -70,8 +88,8 @@ export default function EarnScreen() {
       <View style={styles.card}>
         <View style={styles.rowCenter}>
           <CustomVectorIcons
-            name="stack"
-            iconSet="Entypo"
+            name="layers"
+            iconSet="Feather"
             color="#ff9500"
             size={18}
             style={{ marginRight: 6 }}
@@ -81,11 +99,10 @@ export default function EarnScreen() {
 
         <View style={[styles.rowBetween, { marginTop: 10 }]}>
           <View style={styles.stackItem}>
-            <CustomVectorIcons
-              name="currency-rupee"
-              iconSet="MaterialCommunityIcons"
-              color="#00ffa2"
-              size={20}
+            <Image
+              source={IMAGES.thetre}
+              style={styles.smallImage}
+              resizeMode="contain"
             />
             <Text style={styles.aprTextSmall}>6.43%</Text>
           </View>
@@ -99,11 +116,10 @@ export default function EarnScreen() {
             <Text style={styles.aprTextSmall}>4.12%</Text>
           </View>
           <View style={styles.stackItem}>
-            <CustomVectorIcons
-              name="solidity"
-              iconSet="MaterialCommunityIcons"
-              color="#00f2ff"
-              size={20}
+            <Image
+              source={IMAGES.solana}
+              style={styles.smallImage}
+              resizeMode="contain"
             />
             <Text style={styles.aprTextSmall}>5.27%</Text>
           </View>
@@ -127,8 +143,8 @@ export default function EarnScreen() {
         <View style={[styles.card, styles.innerCard]}>
           <View style={styles.rowCenter}>
             <CustomVectorIcons
-              name="binance"
-              iconSet="FontAwesome6"
+              name="dollar-sign"
+              iconSet="Feather"
               color="#f3ba2f"
               size={22}
               style={{ marginRight: 6 }}
@@ -145,14 +161,22 @@ export default function EarnScreen() {
 
           <View style={[styles.rowBetween, { marginTop: 8 }]}>
             <View style={styles.stackItem}>
+              <Image
+                source={IMAGES.thetre}
+                style={styles.smallImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.aprTextSmall}>5.27%</Text>
+            </View>
+            {/* <View style={styles.stackItem}>
               <CustomVectorIcons
-                name="currency-rupee"
-                iconSet="MaterialCommunityIcons"
+                name="dollar-sign"
+                iconSet="Feather"
                 color="#00ffa2"
                 size={20}
               />
               <Text style={styles.aprTextSmall}>6.43%</Text>
-            </View>
+            </View> */}
             <View style={styles.stackItem}>
               <CustomVectorIcons
                 name="bitcoin"
@@ -163,22 +187,31 @@ export default function EarnScreen() {
               <Text style={styles.aprTextSmall}>4.12%</Text>
             </View>
             <View style={styles.stackItem}>
+              <Image
+                source={IMAGES.solana}
+                style={styles.smallImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.aprTextSmall}>5.27%</Text>
+            </View>
+            {/* <View style={styles.stackItem}>
               <CustomVectorIcons
-                name="solidity"
-                iconSet="MaterialCommunityIcons"
+                name="ethereum"
+                iconSet="FontAwesome6"
                 color="#00f2ff"
                 size={20}
               />
               <Text style={styles.aprTextSmall}>5.27%</Text>
-            </View>
+            </View> */}
           </View>
         </View>
-        {/* SFPLUS  */}
+
+        {/* SFPLUS Section */}
         <View style={[styles.card, styles.innerCard]}>
           <View style={styles.rowCenter}>
             <CustomVectorIcons
-              name="binance"
-              iconSet="FontAwesome6"
+              name="star"
+              iconSet="Feather"
               color="#f3ba2f"
               size={22}
               style={{ marginRight: 6 }}
@@ -192,32 +225,45 @@ export default function EarnScreen() {
 
           <View style={[styles.rowBetween, { marginTop: 8 }]}>
             <View style={styles.stackItem}>
-              <CustomVectorIcons
-                name="currency-rupee"
-                iconSet="MaterialCommunityIcons"
-                color="#00ffa2"
-                size={20}
-              />
-              <Text style={styles.aprTextSmall}>6.43%</Text>
+              {/* <Image
+                source={IMAGES.thetre}
+                style={styles.smallImage}
+                resizeMode="contain"
+              /> */}
+              <Text style={styles.aprTextSmall}>
+                Rewards <Text style={styles.number}>518K+</Text>
+              </Text>
             </View>
             <View style={styles.stackItem}>
-              <CustomVectorIcons
+              {/* <CustomVectorIcons
                 name="bitcoin"
                 iconSet="FontAwesome6"
                 color="#f7931a"
                 size={20}
-              />
-              <Text style={styles.aprTextSmall}>4.12%</Text>
+              /> */}
+              <Text style={styles.aprTextSmall}>
+                Stakers <Text style={styles.number}>12.8+</Text>
+              </Text>
             </View>
             <View style={styles.stackItem}>
+              {/* <Image
+                source={IMAGES.solana}
+                style={styles.smallImage}
+                resizeMode="contain"
+              /> */}
+              <Text style={styles.aprTextSmall}>
+                TVL <Text style={styles.number}> 3.0M+</Text>
+              </Text>
+            </View>
+            {/* <View style={styles.stackItem}>
               <CustomVectorIcons
-                name="solidity"
-                iconSet="MaterialCommunityIcons"
+                name="ethereum"
+                iconSet="FontAwesome6"
                 color="#00f2ff"
                 size={20}
               />
               <Text style={styles.aprTextSmall}>5.27%</Text>
-            </View>
+            </View> */}
           </View>
         </View>
       </View>
@@ -292,7 +338,7 @@ const styles = StyleSheet.create({
   },
   aprTextSmall: {
     color: '#fff',
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '500',
     marginLeft: 6,
   },
@@ -309,5 +355,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 8,
     lineHeight: 18,
+  },
+  image: {
+    width: 24,
+    height: 24,
+  },
+  smallImage: {
+    width: 20,
+    height: 20,
+  },
+  number: {
+    color: 'red',
   },
 });

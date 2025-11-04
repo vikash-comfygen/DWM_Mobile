@@ -245,7 +245,7 @@ const WalletIntroScreen = ({ navigation }) => {
           {/* Swiper for title, subtitle, and GIF */}
           <Swiper
             style={styles.swiper}
-            showsPagination={true}
+            showsPagination={false}
             autoplay={true}
             autoplayTimeout={3}
           >

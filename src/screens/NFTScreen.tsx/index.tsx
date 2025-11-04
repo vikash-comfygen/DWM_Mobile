@@ -5,64 +5,58 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  FlatList,
   ScrollView,
 } from 'react-native';
 import CustomVectorIcons from '../../components/CustomVectorIcons';
 
+const cryptoIcons = [
+  { id: '1', name: 'bitcoin', iconSet: 'FontAwesome6', color: '#f7931a' },
+  { id: '2', name: 'ethereum', iconSet: 'FontAwesome6', color: '#627eea' },
+  {
+    id: '3',
+    name: 'solidity',
+    iconSet: 'MaterialCommunityIcons',
+    color: '#00f2ff',
+  },
+  { id: '4', name: 'tether', iconSet: 'FontAwesome6', color: '#26a17b' },
+  {
+    id: '5',
+    name: 'litecoin',
+    iconSet: 'MaterialCommunityIcons',
+    color: '#345c9c',
+  },
+  { id: '6', name: 'dogecoin', iconSet: 'FontAwesome6', color: '#c2a633' },
+  { id: '7', name: 'ripple', iconSet: 'FontAwesome6', color: '#00aae4' },
+  {
+    id: '8',
+    name: 'cardano',
+    iconSet: 'MaterialCommunityIcons',
+    color: '#0033ad',
+  },
+];
+
 export default function NFTScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scroll}>
-      {/* Header */}
-      {/* <Text style={styles.title}>My NFTs</Text> */}
-
-      {/* 🔹 Crypto Icons Row */}
-      <View style={styles.cryptoRow}>
-        <View style={styles.cryptoIconBox}>
-          <CustomVectorIcons
-            name="bitcoin"
-            iconSet="FontAwesome6"
-            size={30}
-            color="#f7931a"
-          />
-          <Text style={styles.cryptoName}>BTC</Text>
-        </View>
-        <View style={styles.cryptoIconBox}>
-          <CustomVectorIcons
-            name="ethereum"
-            iconSet="FontAwesome6"
-            size={30}
-            color="#627eea"
-          />
-          <Text style={styles.cryptoName}>ETH</Text>
-        </View>
-        <View style={styles.cryptoIconBox}>
-          <CustomVectorIcons
-            name="solidity"
-            iconSet="MaterialCommunityIcons"
-            size={30}
-            color="#00f2ff"
-          />
-          <Text style={styles.cryptoName}>SOL</Text>
-        </View>
-        <View style={styles.cryptoIconBox}>
-          <CustomVectorIcons
-            name="tether"
-            iconSet="FontAwesome6"
-            size={30}
-            color="#26a17b"
-          />
-          <Text style={styles.cryptoName}>USDT</Text>
-        </View>
-        <View style={styles.cryptoIconBox}>
-          <CustomVectorIcons
-            name="litecoin"
-            iconSet="MaterialCommunityIcons"
-            size={30}
-            color="#345c9c"
-          />
-          <Text style={styles.cryptoName}>LTC</Text>
-        </View>
-      </View>
+      {/* 🔹 Crypto Icons Horizontal Scroll */}
+      <FlatList
+        data={cryptoIcons}
+        keyExtractor={item => item.id}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.cryptoRow}
+        renderItem={({ item }) => (
+          <View style={styles.cryptoIconBox}>
+            <CustomVectorIcons
+              name={item.name}
+              iconSet={item.iconSet}
+              size={30}
+              color={item.color}
+            />
+          </View>
+        )}
+      />
 
       {/* 🔹 Search Bar + Actions in One Row */}
       <View style={styles.searchActionRow}>
@@ -83,42 +77,19 @@ export default function NFTScreen() {
         </View>
 
         {/* Receive */}
-        <TouchableOpacity style={styles.actionButton}>
-          <CustomVectorIcons
-            name="download"
-            iconSet="Feather"
-            color="#00ffa2"
-            size={18}
-          />
+        <TouchableOpacity style={[styles.actionButton, styles.receiveButton]}>
           <Text style={styles.actionText}>Receive</Text>
         </TouchableOpacity>
 
         {/* More */}
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={[styles.actionButton, styles.moreButton]}>
           <CustomVectorIcons
             name="more-horizontal"
             iconSet="Feather"
-            color="#888"
+            color="#fff"
             size={18}
           />
-          <Text style={styles.actionText}>More</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* 🔹 NFT Grid */}
-      <Text style={styles.sectionTitle}>Your NFTs</Text>
-      <View style={styles.nftGrid}>
-        {[1, 2, 3, 4, 5, 6].map((_, i) => (
-          <View key={i} style={styles.nftBox}>
-            <CustomVectorIcons
-              name="image"
-              iconSet="Feather"
-              color="#555"
-              size={36}
-            />
-            <Text style={styles.nftText}>NFT #{i + 1}</Text>
-          </View>
-        ))}
       </View>
     </ScrollView>
   );
@@ -132,30 +103,22 @@ const styles = StyleSheet.create({
   scroll: {
     padding: 16,
   },
-  title: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 16,
-  },
   cryptoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+    paddingVertical: 10,
   },
   cryptoIconBox: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#1c1c1e',
+    borderRadius: 25,
     alignItems: 'center',
-  },
-  cryptoName: {
-    color: '#ccc',
-    fontSize: 12,
-    marginTop: 6,
+    justifyContent: 'center',
+    marginRight: 12,
   },
   searchActionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'transparent',
-    marginBottom: 20,
+    marginTop: 20,
   },
   searchBar: {
     flexDirection: 'row',
@@ -163,7 +126,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1c1c1e',
     borderRadius: 12,
     paddingHorizontal: 10,
-    flex: 1, // takes available width
+    flex: 1,
     height: 40,
     marginRight: 8,
   },
@@ -175,36 +138,19 @@ const styles = StyleSheet.create({
   actionButton: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
+    height: 40,
+    borderRadius: 12,
+  },
+  receiveButton: {
+    backgroundColor: '#2a2a2e',
+  },
+  moreButton: {
+    backgroundColor: '#444',
+    marginLeft: 6,
   },
   actionText: {
     color: '#fff',
-    fontSize: 11,
-    marginTop: 3,
-  },
-  sectionTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 10,
-  },
-  nftGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  nftBox: {
-    width: '47%',
-    backgroundColor: '#1b1b1e',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
-    marginBottom: 12,
-  },
-  nftText: {
-    color: '#aaa',
-    fontSize: 13,
-    marginTop: 8,
+    fontSize: 14,
   },
 });

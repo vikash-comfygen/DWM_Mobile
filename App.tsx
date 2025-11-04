@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import Routes from './src/navigation/routes';
+import { ThemeProvider } from './src/theme/themeContext';
 // import { ThemeProvider } from '@theme/themeContext';
 // import TestComponent from './TestComponent';
 
@@ -9,11 +10,11 @@ import Routes from './src/navigation/routes';
 
 const App: React.FC = () => {
   return (
-    // <ThemeProvider>
-    // <PaperProvider>
-    <Routes />
-    // </PaperProvider>
-    // </ThemeProvider>
+    <ThemeProvider>
+      {/* // <PaperProvider> */}
+      <Routes />
+      {/* // </PaperProvider> */}
+    </ThemeProvider>
   );
 };
 

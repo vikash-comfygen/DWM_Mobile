@@ -54,7 +54,7 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import * as LucideIcons from 'lucide-react-native';
-import { useTheme } from '@theme/themeContext';
+import { useTheme } from '../theme/themeContext';
 
 interface CustomLucideIconProps {
   name: keyof typeof LucideIcons;

@@ -17,7 +17,8 @@ export default function ConfirmPasswordScreen({ navigation }) {
     if (numericCode.length === 6) {
       if (numericCode === initialPassword) {
         Alert.alert('✅ Success', 'Password created successfully!');
-        navigation.navigate('WalletScreen');
+        // ✅ Replace auth flow with main app (bottom tabs)
+        navigation.replace('MainApp');
       } else {
         Alert.alert('❌ Mismatch', 'Passwords do not match.');
         navigation.goBack();
