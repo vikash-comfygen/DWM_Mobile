@@ -1,130 +1,312 @@
-import React from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Animated,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import CustomVectorIcons from '../../components/CustomVectorIcons';
 
 const SwapScreen = () => {
+  const [showDetails, setShowDetails] = useState(true);
+
+  // Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const cardAnim = useRef(new Animated.Value(0)).current;
+  const providerAnim = useRef(new Animated.Value(0)).current;
+  const noticeAnim = useRef(new Animated.Value(0)).current;
+
+  useFocusEffect(
+    useCallback(() => {
+      fadeAnim.setValue(0);
+      cardAnim.setValue(0);
+      providerAnim.setValue(0);
+      noticeAnim.setValue(0);
+
+      Animated.sequence([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.stagger(100, [
+          Animated.timing(cardAnim, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(providerAnim, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(noticeAnim, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
+    }, []),
+  );
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Top Tabs */}
-      <View style={styles.tabsContainer}>
-        {['Swap', 'Bridge', 'Buy/Sell'].map((tab, i) => (
-          <TouchableOpacity key={i}>
-            <Text style={[styles.tabText, tab === 'Swap' && styles.activeTab]}>
-              {tab}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Pay Section */}
-      <View style={styles.swapCard}>
-        <View style={styles.rowBetween}>
-          <View style={styles.row}>
-            <CustomVectorIcons name="btc" size={28} color="#f7931a" />
-            <View style={{ marginLeft: 8 }}>
-              <Text style={styles.coinSymbol}>BTC</Text>
-              <Text style={styles.coinName}>Bitcoin</Text>
-            </View>
-          </View>
-          <View style={styles.rightBox}>
-            <CustomVectorIcons name="wallet" size={16} color="#777" />
-            <Text style={styles.amountText}>0</Text>
-            <TouchableOpacity>
-              <Text style={styles.maxText}>Max</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <Animated.ScrollView
+        style={[styles.container, { opacity: fadeAnim }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Top Tabs */}
+        <View style={styles.tabsContainer}>
+          {['Swap', 'Bridge', 'Buy/Sell'].map((tab, i) => (
+            <TouchableOpacity key={i}>
+              <Text
+                style={[styles.tabText, tab === 'Swap' && styles.activeTab]}
+              >
+                {tab}
+              </Text>
             </TouchableOpacity>
-          </View>
+          ))}
         </View>
 
-        <Text style={styles.placeholderText}>Enter Amount</Text>
-      </View>
-
-      {/* Swap Icon (Center Floating) */}
-      <View style={styles.centerIcon}>
-        <View style={styles.swapIconCircle}>
-          <CustomVectorIcons name="swap-vertical" size={18} color="#fff" />
-        </View>
-      </View>
-
-      {/* Receive Section */}
-      <View style={styles.swapCard}>
-        <View style={styles.rowBetween}>
-          <View style={styles.row}>
-            <CustomVectorIcons name="eth" size={28} color="#627eea" />
-            <View style={{ marginLeft: 8 }}>
-              <Text style={styles.coinSymbol}>ETH</Text>
-              <Text style={styles.coinName}>Ethereum</Text>
+        {/* Pay Section */}
+        <Animated.View
+          style={[
+            styles.swapCard,
+            {
+              opacity: cardAnim,
+              transform: [
+                {
+                  translateY: cardAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [30, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <View style={styles.rowBetween}>
+            <View style={styles.row}>
+              <CustomVectorIcons
+                name="logo-bitcoin"
+                size={28}
+                color="#f7931a"
+                iconSet="Ionicons"
+              />
+              <View style={{ marginLeft: 8 }}>
+                <Text style={styles.coinSymbol}>BTC</Text>
+                <Text style={styles.coinName}>Bitcoin</Text>
+              </View>
+            </View>
+            <View style={styles.rightBox}>
+              <CustomVectorIcons
+                name="wallet"
+                size={16}
+                color="#777"
+                iconSet="Feather"
+              />
+              <Text style={styles.amountText}>0</Text>
+              <TouchableOpacity>
+                <Text style={styles.maxText}>Max</Text>
+              </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.rightBox}>
-            <CustomVectorIcons name="wallet" size={16} color="#777" />
-            <Text style={styles.amountText}>0</Text>
-          </View>
-        </View>
-      </View>
 
-      {/* Swap Button */}
-      <TouchableOpacity style={styles.swapBtn}>
-        <Text style={styles.swapBtnText}>Swap</Text>
-      </TouchableOpacity>
+          <Text style={styles.placeholderText}>Enter Amount</Text>
+        </Animated.View>
 
-      {/* Provider Info */}
-      <View style={styles.providerCard}>
-        <View style={styles.rowBetween}>
-          <Text style={styles.infoLabel}>Provider</Text>
-          <View style={styles.row}>
-            <CustomVectorIcons name="flash" size={14} color="#ffcc00" />
-            <Text style={styles.infoValue}> Bridges</Text>
+        {/* Swap Icon (Center Floating) */}
+        <View style={styles.centerIcon}>
+          <View style={styles.swapIconCircle}>
             <CustomVectorIcons
-              name="right"
-              size={12}
-              color="#777"
-              style={{ marginLeft: 4 }}
+              name="swap-vertical"
+              size={18}
+              color="#fff"
+              iconSet="Ionicons"
             />
           </View>
         </View>
 
-        <View style={styles.rowBetween}>
-          <Text style={styles.infoLabel}>Slippage</Text>
-          <Text style={styles.infoValue}>3%</Text>
-        </View>
+        {/* Receive Section */}
+        <Animated.View
+          style={[
+            styles.swapCard,
+            {
+              opacity: cardAnim,
+              transform: [
+                {
+                  translateY: cardAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [50, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <View style={styles.rowBetween}>
+            <View style={styles.row}>
+              <CustomVectorIcons
+                name="logo-ethereum"
+                size={28}
+                color="#627eea"
+                iconSet="Ionicons"
+              />
+              <View style={{ marginLeft: 8 }}>
+                <Text style={styles.coinSymbol}>ETH</Text>
+                <Text style={styles.coinName}>Ethereum</Text>
+              </View>
+            </View>
+            <View style={styles.rightBox}>
+              <CustomVectorIcons
+                name="wallet"
+                size={16}
+                color="#777"
+                iconSet="Feather"
+              />
+              <Text style={styles.amountText}>0</Text>
+            </View>
+          </View>
+        </Animated.View>
 
-        <View style={styles.rowBetween}>
-          <Text style={styles.infoLabel}>Rate</Text>
-          <Text style={styles.infoValue}>1 BTC = 108998.827 USD</Text>
-        </View>
+        {/* Swap Button */}
+        <Animated.View
+          style={[
+            styles.swapBtn,
+            {
+              opacity: cardAnim,
+              transform: [
+                {
+                  translateY: cardAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [60, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <TouchableOpacity>
+            <Text style={styles.swapBtnText}>Swap</Text>
+          </TouchableOpacity>
+        </Animated.View>
 
-        <View style={styles.rowBetween}>
-          <Text style={styles.infoLabel}>Time</Text>
-          <Text style={styles.infoValue}>Instant</Text>
-        </View>
+        {/* Provider Info */}
+        <Animated.View
+          style={[
+            styles.providerCard,
+            {
+              opacity: providerAnim,
+              transform: [
+                {
+                  translateY: providerAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [40, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <View style={styles.rowBetween}>
+            <Text style={styles.infoLabel}>Provider</Text>
+            <View style={styles.row}>
+              <CustomVectorIcons
+                name="flash"
+                size={14}
+                color="#ffcc00"
+                iconSet="Ionicons"
+              />
+              <Text style={styles.infoValue}> Bridges</Text>
+              <CustomVectorIcons
+                name="chevron-forward"
+                size={12}
+                color="#777"
+                iconSet="Ionicons"
+                style={{ marginLeft: 4 }}
+              />
+            </View>
+          </View>
 
-        <View style={styles.expandArrow}>
-          <CustomVectorIcons name="chevron-up" size={16} color="#777" />
-        </View>
-      </View>
+          <View style={styles.rowBetween}>
+            <Text style={styles.infoLabel}>Slippage</Text>
+            <Text style={styles.infoValue}>3%</Text>
+          </View>
 
-      {/* Disclaimer Box */}
-      <View style={styles.noticeBox}>
-        <CustomVectorIcons name="alert" size={16} color="#ffcc00" />
-        <Text style={styles.noticeText}>
-          Due to exchange rate fluctuations, there may be a slight difference
-          between the amount you actually receive and the estimated amount on
-          this page.
-        </Text>
-      </View>
-    </ScrollView>
+          {/* Rate & Time (Toggle Visibility) */}
+          {showDetails && (
+            <>
+              <View style={styles.rowBetween}>
+                <Text style={styles.infoLabel}>Rate</Text>
+                <Text style={styles.infoValue}>1 BTC = 108998.827 USD</Text>
+              </View>
+
+              <View style={styles.rowBetween}>
+                <Text style={styles.infoLabel}>Time</Text>
+                <Text style={styles.infoValue}>Instant</Text>
+              </View>
+            </>
+          )}
+
+          <TouchableOpacity
+            style={styles.expandArrow}
+            onPress={() => setShowDetails(!showDetails)}
+          >
+            <CustomVectorIcons
+              name={showDetails ? 'chevron-up' : 'chevron-down'}
+              size={16}
+              color="#777"
+              iconSet="Feather"
+            />
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Disclaimer Box */}
+        <Animated.View
+          style={[
+            styles.noticeBox,
+            {
+              opacity: noticeAnim,
+              transform: [
+                {
+                  translateY: noticeAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [50, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <CustomVectorIcons
+            name="alert-circle"
+            size={16}
+            color="#ffcc00"
+            iconSet="Feather"
+          />
+          <Text style={styles.noticeText}>
+            Due to exchange rate fluctuations, there may be a slight difference
+            between the amount you actually receive and the estimated amount on
+            this page.
+          </Text>
+        </Animated.View>
+      </Animated.ScrollView>
+    </SafeAreaView>
   );
 };
 
 export default SwapScreen;
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#0F0F12',
+  },
   container: {
     flex: 1,
     backgroundColor: '#0F0F12',

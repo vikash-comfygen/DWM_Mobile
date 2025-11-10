@@ -4,6 +4,8 @@ const IMAGES = {
   creditcard: require('./creditcard.png'),
   solana: require('./solana.png'),
   thetre: require('./thetre.png'),
+  logo: require('./logo.png'),
+  banner: require('./banner.png'),
 };
 
 export default IMAGES;

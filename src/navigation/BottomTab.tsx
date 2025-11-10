@@ -2,13 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { scale } from 'react-native-size-matters';
-
 import { getBottomSpace } from 'react-native-iphone-x-helper';
-
-// ✅ Use the same icon component as WalletScreen
 import CustomVectorIcons from '../components/CustomVectorIcons';
 
-// Screens
+// Import your animated screens
 import CoinScreen from '../screens/CoinScreen';
 import WalletScreen from '../screens/HomeScreen/WalletScreen';
 import ExploreScreen from '../screens/ExploreScreen';
@@ -24,7 +21,7 @@ const TabBarIcon = ({ focused, label, iconName }) => {
         name={iconName}
         size={24}
         color={focused ? '#8a2be2' : '#666'}
-        iconSet="Feather" // ✅ Always define iconSet
+        iconSet="Feather"
       />
       <Text
         style={[styles.bottomTabText, { color: focused ? '#8a2be2' : '#666' }]}
@@ -42,6 +39,9 @@ const BottomTab = () => {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: styles.bottomNav,
+        // Add this to ensure screens are properly mounted
+        unmountOnBlur: false,
+        lazy: false, // This ensures all screens are loaded initially
       }}
     >
       <Tab.Screen
@@ -106,29 +106,25 @@ const BottomTab = () => {
 };
 
 const styles = StyleSheet.create({
-  // 🔹 Bottom Tab Bar
   bottomNav: {
     backgroundColor: '#0f0f0f',
     borderTopWidth: 1,
     borderTopColor: '#1a1a1a',
-    height: Platform.OS === 'android' ? 60 : 70, // Adjusted height
+    height: Platform.OS === 'android' ? 60 : 70,
     paddingBottom: Platform.OS === 'android' ? 10 : getBottomSpace() + 10,
     paddingTop: 8,
     elevation: 10,
   },
-
-  // 🔹 Each Tab
   bottomTab: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 4, // smaller padding
-    minHeight: 50, // ensures enough space for icon+label
+    paddingVertical: 4,
+    minHeight: 50,
   },
-
   bottomTabText: {
     fontSize: scale(8),
     fontWeight: '500',
-    marginTop: 3, // smaller margin
+    marginTop: 3,
     textAlign: 'center',
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,11 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Animated,
 } from 'react-native';
 import CustomVectorIcons from '../../components/CustomVectorIcons';
 
-const MoneyInvestShowing = () => {
+const MoneyInvestShowing = ({ navigation }) => {
   const [balanceVisible, setBalanceVisible] = useState(true);
 
   const coins = [
@@ -56,59 +57,254 @@ const MoneyInvestShowing = () => {
   ];
 
   const quickActions = [
-    { name: 'Send', icon: 'arrow-up', iconSet: 'Feather' },
-    { name: 'Receive', icon: 'arrow-down', iconSet: 'Feather' },
-    { name: 'Buy', icon: 'plus-circle', iconSet: 'Feather' },
-    { name: 'Gas Station', icon: 'droplet', iconSet: 'Feather' },
-    { name: 'More', icon: 'more-horizontal', iconSet: 'Feather' },
+    {
+      name: 'Send',
+      icon: 'arrow-up',
+      iconSet: 'Feather',
+      screen: 'SendScreen',
+      description: 'Send crypto to others',
+    },
+    {
+      name: 'Receive',
+      icon: 'arrow-down',
+      iconSet: 'Feather',
+      screen: 'ReceiveScreen',
+      description: 'Receive crypto from others',
+    },
+    {
+      name: 'Buy',
+      icon: 'plus-circle',
+      iconSet: 'Feather',
+      screen: 'BuySellScreen',
+      description: 'Buy crypto with fiat',
+    },
+    {
+      name: 'Gas Station',
+      icon: 'droplet',
+      iconSet: 'Feather',
+      screen: 'GasStationScreen',
+      description: 'Manage gas fees',
+    },
+    {
+      name: 'More',
+      icon: 'more-horizontal',
+      iconSet: 'Feather',
+      screen: 'MoreOptionsScreen',
+      description: 'More options',
+    },
   ];
+
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideUpAnim = useRef(new Animated.Value(30)).current;
+
+  // Balance section animations
+  const balanceAnim = useRef(new Animated.Value(0)).current;
+
+  // Quick actions animations
+  const actionAnims = useRef(
+    quickActions.map(() => new Animated.Value(0)),
+  ).current;
+
+  // Search section animations
+  const searchAnim = useRef(new Animated.Value(0)).current;
+  const filterAnim = useRef(new Animated.Value(0)).current;
+  const moreAnim = useRef(new Animated.Value(0)).current;
+
+  // Coin list animations
+  const coinAnims = useRef(coins.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    // Main animation sequence
+    Animated.sequence([
+      // Fade in entire screen
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+
+      // Balance section
+      Animated.parallel([
+        Animated.timing(balanceAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideUpAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]),
+
+      // Quick actions staggered
+      Animated.stagger(
+        80,
+        actionAnims.map(anim =>
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+          }),
+        ),
+      ),
+
+      // Search section elements
+      Animated.stagger(100, [
+        Animated.timing(searchAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(filterAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(moreAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]),
+
+      // Coin list staggered
+      Animated.stagger(
+        120,
+        coinAnims.map(anim =>
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ),
+      ),
+    ]).start();
+  }, []);
+
+  // In MoneyInvestShowing.js, try this approach:
+  const handleActionPress = (screenName, actionName) => {
+    console.log(`Navigating to ${screenName} for ${actionName}`);
+
+    // If navigation.navigate doesn't work, try resetting or replacing
+    navigation.reset({
+      index: 0,
+      routes: [{ name: screenName, params: { action: actionName } }],
+    });
+  };
+
+  // Handle coin item press
+  const handleCoinPress = coin => {
+    console.log(`Coin pressed: ${coin.name}`);
+    navigation.navigate('CoinDetailScreen', { coin });
+  };
 
   const renderCoinContent = () => (
     <View style={styles.coinList}>
       {coins.map((coin, index) => (
-        <TouchableOpacity key={index} style={styles.coinItem}>
-          <View style={styles.coinLeft}>
-            <View style={styles.coinIcon}>
-              <CustomVectorIcons
-                name="bitcoin"
-                size={24}
-                color="#fff"
-                iconSet="FontAwesome5"
-              />
-            </View>
-            <View style={styles.coinInfo}>
-              <View style={styles.coinNameRow}>
-                <Text style={styles.coinName}>{coin.name}</Text>
-                <Text style={styles.coinSymbol}>({coin.symbol})</Text>
+        <Animated.View
+          key={index}
+          style={{
+            opacity: coinAnims[index],
+            transform: [
+              {
+                translateX: coinAnims[index].interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-100, 0],
+                }),
+              },
+              {
+                scale: coinAnims[index].interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.9, 1],
+                }),
+              },
+            ],
+          }}
+        >
+          <TouchableOpacity
+            style={styles.coinItem}
+            onPress={() => handleCoinPress(coin)}
+          >
+            <View style={styles.coinLeft}>
+              <Animated.View
+                style={[
+                  styles.coinIcon,
+                  {
+                    transform: [
+                      {
+                        scale: coinAnims[index].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, 1],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                <CustomVectorIcons
+                  name="bitcoin"
+                  size={24}
+                  color="#fff"
+                  iconSet="FontAwesome5"
+                />
+              </Animated.View>
+              <View style={styles.coinInfo}>
+                <View style={styles.coinNameRow}>
+                  <Text style={styles.coinName}>{coin.name}</Text>
+                  <Text style={styles.coinSymbol}>({coin.symbol})</Text>
+                </View>
+                <View style={styles.coinValueRow}>
+                  <Text style={styles.coinValue}>{coin.value}</Text>
+                  <Text
+                    style={[
+                      styles.coinChange,
+                      coin.changeType === 'positive'
+                        ? styles.positiveChange
+                        : styles.negativeChange,
+                    ]}
+                  >
+                    {`  ${coin.change2}`}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.coinValueRow}>
-                <Text style={styles.coinValue}>{coin.value}</Text>
-                <Text
-                  style={[
-                    styles.coinChange,
-                    coin.changeType === 'positive'
-                      ? styles.positiveChange
-                      : styles.negativeChange,
-                  ]}
-                >
-                  {`  ${coin.change2}`}
-                </Text>
-              </View>
             </View>
-          </View>
-          <View style={styles.coinRight}>
-            <Text style={styles.coinPrice}>{coin.price}</Text>
-            <Text style={styles.coinChange2}>{coin.change}</Text>
-          </View>
-        </TouchableOpacity>
+            <View style={styles.coinRight}>
+              <Text style={styles.coinPrice}>{coin.price}</Text>
+              <Text style={styles.coinChange2}>{coin.change}</Text>
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
       ))}
     </View>
   );
 
   return (
-    <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+    <Animated.ScrollView
+      style={[styles.scrollView, { opacity: fadeAnim }]}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Balance Section */}
-      <View style={styles.balanceSection}>
+      <Animated.View
+        style={[
+          styles.balanceSection,
+          {
+            opacity: balanceAnim,
+            transform: [
+              {
+                translateY: slideUpAnim,
+              },
+              {
+                scale: balanceAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.8, 1],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
         <View style={styles.balanceHeader}>
           <Text style={styles.balanceLabel}>Balance</Text>
           <TouchableOpacity onPress={() => setBalanceVisible(!balanceVisible)}>
@@ -126,64 +322,156 @@ const MoneyInvestShowing = () => {
         <Text style={styles.btcAmount}>
           {balanceVisible ? '0 BTC' : '******'}
         </Text>
-      </View>
+      </Animated.View>
 
       {/* Quick Actions */}
       <View style={styles.quickActions}>
         {quickActions.map((action, index) => (
-          <TouchableOpacity key={index} style={styles.actionButton}>
-            <View style={styles.actionIcon}>
-              <CustomVectorIcons
-                name={action.icon}
-                size={24}
-                color="#fff"
-                iconSet={action.iconSet}
-              />
-            </View>
-            <Text style={styles.actionText}>{action.name}</Text>
-          </TouchableOpacity>
+          <Animated.View
+            key={index}
+            style={{
+              opacity: actionAnims[index],
+              transform: [
+                {
+                  translateY: actionAnims[index].interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [50, 0],
+                  }),
+                },
+                {
+                  scale: actionAnims[index].interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.5, 1],
+                  }),
+                },
+              ],
+            }}
+          >
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => handleActionPress(action.screen, action.name)}
+            >
+              <View style={styles.actionIcon}>
+                <CustomVectorIcons
+                  name={action.icon}
+                  size={24}
+                  color="#fff"
+                  iconSet={action.iconSet}
+                />
+              </View>
+              <Text style={styles.actionText}>{action.name}</Text>
+            </TouchableOpacity>
+          </Animated.View>
         ))}
       </View>
 
       {/* Search Section */}
-      <View style={styles.searchHeader}>
-        <View style={styles.searchContainer}>
-          <CustomVectorIcons
-            name="search"
-            size={18}
-            color="#666"
-            iconSet="Feather"
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search"
-            placeholderTextColor="#666"
-          />
-        </View>
+      <Animated.View
+        style={[
+          styles.searchHeader,
+          {
+            opacity: fadeAnim,
+            transform: [
+              {
+                translateY: slideUpAnim,
+              },
+            ],
+          },
+        ]}
+      >
+        <Animated.View
+          style={{
+            flex: 3,
+            opacity: searchAnim,
+            transform: [
+              {
+                translateX: searchAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-50, 0],
+                }),
+              },
+            ],
+          }}
+        >
+          <View style={styles.searchContainer}>
+            <CustomVectorIcons
+              name="search"
+              size={18}
+              color="#666"
+              iconSet="Feather"
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search coins..."
+              placeholderTextColor="#666"
+            />
+          </View>
+        </Animated.View>
 
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>All</Text>
-          <CustomVectorIcons
-            name="chevron-down"
-            size={14}
-            color="#fff"
-            iconSet="Feather"
-          />
-        </TouchableOpacity>
+        <Animated.View
+          style={{
+            flex: 1,
+            opacity: filterAnim,
+            transform: [
+              {
+                translateY: filterAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [20, 0],
+                }),
+              },
+              {
+                scale: filterAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.8, 1],
+                }),
+              },
+            ],
+          }}
+        >
+          <TouchableOpacity style={styles.filterButton}>
+            <Text style={styles.filterText}>All</Text>
+            <CustomVectorIcons
+              name="chevron-down"
+              size={14}
+              color="#fff"
+              iconSet="Feather"
+            />
+          </TouchableOpacity>
+        </Animated.View>
 
-        <TouchableOpacity style={styles.moreButton}>
-          <CustomVectorIcons
-            name="more-vertical"
-            size={20}
-            color="#fff"
-            iconSet="Feather"
-          />
-        </TouchableOpacity>
-      </View>
+        <Animated.View
+          style={{
+            opacity: moreAnim,
+            transform: [
+              {
+                translateY: moreAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [20, 0],
+                }),
+              },
+              {
+                scale: moreAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.8, 1],
+                }),
+              },
+            ],
+          }}
+        >
+          <TouchableOpacity style={styles.moreButton}>
+            <CustomVectorIcons
+              name="more-vertical"
+              size={20}
+              color="#fff"
+              iconSet="Feather"
+            />
+          </TouchableOpacity>
+        </Animated.View>
+      </Animated.View>
 
       {/* Coin Content */}
       {renderCoinContent()}
-    </ScrollView>
+    </Animated.ScrollView>
   );
 };
 
@@ -249,7 +537,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   searchContainer: {
-    flex: 3,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1a1a1a',
@@ -265,7 +552,6 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   filterButton: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
